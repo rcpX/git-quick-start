@@ -1,0 +1,334 @@
+%\documentclass[11pt,a4paper]{article}
+\documentclass[11pt]{article}
+
+%\usepackage{a4wide}
+\usepackage[margin=1.4in]{geometry}
+
+\usepackage{graphicx}
+%\usepackage[german, english]{babel}
+%\usepackage{tabularx}
+%\usepackage{cancel}
+%\usepackage{multirow}
+%\usepackage{supertabular}
+%\usepackage{algorithmic}
+%\usepackage{algorithm}
+%\usepackage{amsthm}
+%\usepackage{float}
+%\usepackage{subfig}
+%\usepackage{rotating}
+\usepackage{amsmath}
+
+\usepackage[T1]{fontenc} % Font encoding
+\usepackage{charter} % Serif body font
+\usepackage[charter]{mathdesign} % Math font
+\usepackage[scale=0.9]{sourcecodepro} % Monospaced fontenc
+\usepackage[lf]{FiraSans} % Sans-serif font
+
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily
+}
+\usepackage{hyperref}
+
+\usepackage{soul} % for st strikethrough command
+
+%\usepackage[round]{natbib}
+\usepackage[natbib=true, style=authoryear, bibstyle=authoryear-comp, 
+maxbibnames=10,
+maxcitenames=2, backend=bibtex8]{biblatex}
+\bibliography{/Users/adamsgaard/articles/own/BIBnew.bib}
+
+
+\begin{document}
+
+\title{A quick-start guide to Git}
+
+\author{Anders Damsgaard\\\url{https://adamsgaard.dk}, \url{andersd@riseup.net}}
+\date{{\small Last revision: \today}}
+
+\maketitle
+
+\section{What is Git?}
+Git is the most popular command-line tool for version control.  It is most 
+commonly used to track changes to plain-text files such as source code.  When a 
+software project is initialized as a Git \emph{repository}, the history of the 
+tracked files are recorded through a series of changes.  When the user performs 
+changes to the tracked files, she can choose to \emph{commit} these changes.  
+Git repositories can be managed through online services such as 
+Github\footnote{\url{https://github.com}}, which allows the changes to be 
+synchronized between multiple contributers and end users.  The same repository 
+can contain multiple versions of the same files.  These coexisting versions are 
+called \emph{branches}.
+
+Git usage is typically very verbose and by design weighs explicitness over 
+convenience.  This ensures that its default behavior does not lead to unintended 
+outcomes.
+
+\section{Installation}
+Please refer to the official documentation\footnote{%
+\url{https://git-scm.com/book/en/v2/Getting-Started-Installing-Git}} for 
+platform-specific instructions on how to install Git.
+My prefered installation method on OS X is through 
+Homebrew\footnote{\url{http://brew.sh}}:
+\begin{lstlisting}
+    $ brew install git
+\end{lstlisting}
+On Debian-based systems, Git can be installed through the advanced package tool:
+\begin{lstlisting}
+    $ apt-get install git
+\end{lstlisting}
+
+Git has excellent built-in documentation through its man page (i.e. \texttt{man 
+    git}).  For documentation on a sub-command such as \texttt{git add}, see its 
+documentation with \texttt{man git-add}. For more complex tasks, I recommend 
+referring to a Git handbook or searching the web (in that order).
+
+\section{Getting started}
+Before using Git for version control, it is a good idea to record some 
+information about yourself. This makes it is easy to see who specific commits 
+can be attributed to when working on projects with multiple contributors.  The 
+user information is stored in a plain-text file in the home directory 
+(\texttt{\textasciitilde/.gitconfig}), and can be created with the following 
+commands:
+\begin{lstlisting}
+    $ git config --global user.name "John Doe"
+    $ git config --global user.email "john-doe-farms@aol.com"
+\end{lstlisting}
+
+\section{Initializing a repository}
+In order to track changes to files in a directory, the directory needs to be 
+initialized as a repository.  Let's say that we want to track the changes to a 
+file \texttt{arithmetic.c} which located in the directory 
+\texttt{\textasciitilde/src/calculator}.  We start off by initializing the 
+directory as a repository:
+\begin{lstlisting}
+    $ cd ~/src/calculator
+    $ git init
+    Initialized empty Git repository in ~/src/calculator/.git/
+\end{lstlisting}
+Git lets us know that the directory is initialized as a new repository, and that 
+the hidden sub-directory \texttt{.git} is used for the files related to the 
+version control\footnote{This directory contains many interesting files, and I 
+    encourage you to explore it when you are more familiar with Git.}.
+
+It is important to realize that just because you initialize a directory as a Git 
+repository, the files and subdirectories are \emph{not automatically tracked}!  
+You need to manually specify which files inside of the directory you want to 
+include in the version control system.  There are several important reasons for 
+this.  As an example, during the compilation step many compilers create object 
+files which are linked together to create the final executable binaries.  These 
+object files are created in machine code, and can have a significant size on the 
+file system.  If Git automatically recorded the changes and versions to all 
+files inside of the repository, it would save all changes in the binary object 
+files, which are of no use since they can be readily reconstructed from the 
+source code.
+
+\section{Creating a local copy of an online repository}
+If you want to create a local copy of an online repository you can download a 
+clone of it in its current stage to your local file system:
+\begin{lstlisting}
+    $ git clone git://github.com/john-doe/tractor-simulation
+\end{lstlisting}
+This will checkout the online repository on Github into a corresponding 
+directory in the local directory.  You can also choose to clone over other 
+protocols such as SSH or HTTPS if you prefer.
+
+The local repository will remember where it was cloned from.  If you have write 
+permissions to the online repository, you can upload your local commits using 
+\texttt{git push}.
+
+\section{Adding files and commiting changes}
+To add a file to the version-control system inside a repository, use the 
+following command:
+\begin{lstlisting}
+    $ git add arithmetic.c
+\end{lstlisting}
+
+One or more changes to the tracked files in a repository must be accompanied by 
+a \emph{commit message}.  The commit message should ideally be short and 
+descriptive of the changes that are contained in the commit.  The commit 
+messages are logged.  It should be easy for a user to glance through the log of 
+commit messages and understand the changes without reading the changes to the 
+files themselves.  This is what sets version-control systems aside from 
+automatic backups.  Only the user herself has the ability to identify when a set 
+of changes are complete and significant, and can formulate a meaningful 
+description of the changes in their respective context.
+
+In case you have forgotten what you have changed in a file, use the following 
+command:
+\begin{lstlisting}
+    $ git diff -- arithmetic.c
+\end{lstlisting}
+
+To commit all files which have been added to the repository, you can use the 
+following command:
+\begin{lstlisting}
+    $ git commit -m "First commit of arithmetic.c"
+\end{lstlisting}
+If you ommit the \texttt{-m} flag and message string (i.e. simply type 
+\texttt{git commit}), Git will open your favorite command-line 
+editor\footnote{You can set which editor you want to use using the 
+    \texttt{EDITOR} environment variable in e.g.  
+    \texttt{\textasciitilde/.bashrc}.}.  You then write the commit message in 
+the editor, and finalize the commit by saving and exiting the file.
+
+If you perform subsequent edits to the file, you need to commit the new changes 
+once again.  We can either once again add the file and commit the changes:
+\begin{lstlisting}
+    $ git add arithmetic.c
+    $ git commit -m "Implemented multiplication"
+\end{lstlisting}
+Alternatively, since the file \texttt{arithmetic.c} is already added to the 
+repository, you can commit \emph{all} changes to \emph{all} tracked files in the 
+repository with a single command:
+\begin{lstlisting}
+    $ git commit -a -m "Implemented multiplication"
+\end{lstlisting}
+Are you not sure which files changed since the last commit? Git can show you an 
+overview of the current state:
+\begin{lstlisting}
+    $ git status
+\end{lstlisting}
+
+\section{Inspecting repository changes and reverting to a previous commit}
+Git can show you an overview of all recorded changes in the repository:
+\begin{lstlisting}
+    $ git log
+    commit 2745f1e3b4803f1c8728089667a18f3178cd18dc
+    Author: John Doe <john-doe-farms@aol.com>
+    Date:   Fri Sep  2 10:22:59 2016 -0700
+
+        Implemented multiplication
+
+    commit 3329dfa1b6bfecc00353d1e9db50bcab9fb41521
+    Author: John Doe <john-doe-farms@aol.com>
+    Date:   Fri Sep  2 10:22:13 2016 -0700
+
+        First commit of arithmetic.c
+
+\end{lstlisting}
+Git can show the changes to the files between any two commits:
+\begin{lstlisting}
+    $ git diff 3329dfa1b 2745f1e3b
+    diff --git a/arithmetic.c b/arithmetic.c
+    index e69de29..523d72b 100644
+    --- a/arithmetic.c
+    +++ b/arithmetic.c
+    @@ -0,0 +1,4 @@
+    +double multiply(double x, double y)
+    +{
+    +    return x * y;
+    +}
+\end{lstlisting}
+
+In case you want to roll back your most recent changes and revert the repository 
+to a stage corresponding to an earlier commit.  Each commit has an uniquely 
+identifying string which is shown with the above command.  To revert you need to 
+supply the first 9 characters of this string:
+\begin{lstlisting}
+    $ git checkout 3329dfa1b
+\end{lstlisting}
+This will revert any changes contained in subsequent commits.  In case you 
+change your mind and want to go back to the most recent commit, use:
+\begin{lstlisting}
+    $ git revert HEAD
+\end{lstlisting}
+The special string \texttt{HEAD} refers to the most recent commit.
+
+\section{Branching and merging}
+Git allows you to have multiple versions (branches) of the same repository.  The 
+first step is to create a new branch and give it a suitable name:
+\begin{lstlisting}
+    $ git checkout -b new_interface
+\end{lstlisting}
+Subsequent commits are staged to the new branch \texttt{new\_interface}.  You 
+can see which branches are present in the repository with \texttt{git branch}:
+\begin{lstlisting}
+    $ git branch
+      master
+    * new_interface
+\end{lstlisting}
+where \texttt{master} is the original branch.  The asterisk denotes what current 
+branch is active.  You can switch between branches, which will automatically 
+apply all relevant patches to the affected files:
+\begin{lstlisting}
+    $ git checkout master
+\end{lstlisting}
+To delete a branch, use \texttt{git branch -d new\_interface}.  To merge another 
+branch into your current active branch, use:
+\begin{lstlisting}
+    $ git merge new_interface
+\end{lstlisting}
+When merging, all commits and file changes performed in a branch are applied to 
+the currently active branch.
+
+\section{Ignoring files}
+Many compilers create auxillary files which are never relevant to track in a 
+version-control system, but clutter your repository overview when using commands 
+such as \texttt{git status} or \text{git commit -a}.  You can specify which 
+files Git should ignore by their filename in a file at the root of the 
+repository in a file named \texttt{.gitignore}.
+For a repository containing C code, an example \texttt{.gitignore} file could 
+contain:
+\begin{lstlisting}
+    *.o
+\end{lstlisting}
+This will ignore all object files.  For a \LaTeX repository the file could 
+contain:
+\begin{lstlisting}
+    *.aux
+    *.glo
+    *.idx
+    *.log
+    *.toc
+    *.ist
+    *.acn
+    *.acr
+    *.alg
+    *.bbl
+    *.blg
+    *.dvi
+    *.glg
+    *.gls
+    *.ilg
+    *.ind
+    *.lof
+    *.lot
+    *.maf
+    *.mtc
+    *.mtc1
+    *.out
+    *.xdy
+    *.synctex.gz
+\end{lstlisting}
+It is up to you to specify the contents of the \texttt{.gitignore} file.  Maybe 
+your program generates output files, which should not be tracked. Simply add 
+their names or file type to the \texttt{.gitignore} file and never encounter 
+them in your Git workflow again.
+
+\section{Extra: Useful shell aliases}
+I like to bind short aliases to the most commonly Git commands. I do this by 
+appending the following to the \texttt{rc} file of my shell 
+(\texttt{\textasciitilde/.zshrc} or \texttt{\textasciitilde/.bashrc}):
+\begin{lstlisting}
+    alias gs='git status | less'
+    alias gl='git log --graph --oneline --decorate --all'
+    alias ga='git add'
+    alias gd='git diff --'
+    alias gc='git commit -v'
+    alias gca='git commit --all --verbose'
+    alias gp='git push'
+    alias gpu='git pull'
+    alias gcgp='git commit --verbose && git push'
+    alias gcagp='git commit --all --verbose && git push'
+\end{lstlisting}
+Using these aliases I can quickly add a file (\texttt{ga file.c}).  
+Alternatively, I can quickly commit all changes to all files that are already 
+tracked in the repository (\texttt{gca}).
+With \texttt{gl} I can quickly see the commit tags and commit messages in short 
+form, and scroll up and down with \texttt{j} and \texttt{k} or the arrow keys.  
+\texttt{gs} gives me a quick overview of the changes in the current repository, 
+and uses the same keys as \texttt{gl} for scrolling.
+
+\end{document}
+
